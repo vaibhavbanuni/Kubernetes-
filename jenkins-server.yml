@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-deployment
+  labels:
+    app: jenkins
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      containers:
+      - name: jenkins-server
+        image: jenkins/jenkins
+        ports:
+        - containerPort: 8080
+        - containerPort: 50000
+          #        securityContext:
+          #runAsUser: 0  # Assuming 1000 is the UID of the jenkins user
+            #runAsGroup: 1000 # Assuming 1000 is the GID of the jenkins group
+        volumeMounts:
+        - name: jenkins-data
+          mountPath: /var/jenkins_home
+      volumes:
+      - name: jenkins-data
+        persistentVolumeClaim:
+          claimName: nfs-pvc
+
